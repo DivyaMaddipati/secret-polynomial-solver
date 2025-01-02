@@ -1,52 +1,49 @@
 const fs = require('fs');
 
-// Helper function to decode y-values
+//decode y-values
 function decodeY(base, value) {
     return parseInt(value, base);
 }
 
-// Function to compute Lagrange Interpolation
+//compute Lagrange Interpolation
 function lagrangeInterpolation(roots, k) {
     let constantTerm = 0;
 
-    // Iterate over each root for interpolation
+    // Iterating over each root for interpolation
     for (let i = 0; i < k; i++) {
         const { x: xi, y: yi } = roots[i];
         let term = yi;
 
-        // Compute Lagrange basis polynomial L_i(0)
+        // Computing Lagrange basis polynomial L_i(0)
         for (let j = 0; j < k; j++) {
             if (i === j) continue;
             const { x: xj } = roots[j];
             term *= -xj / (xi - xj);
         }
 
-        // Add to the constant term
+        // Adding to the constant term
         constantTerm += term;
     }
 
-    return Math.round(constantTerm); // Round for precision
+    return Math.round(constantTerm); 
 }
 
-// Function to process a test case
+//processing a test case
 function processTestCase(filePath) {
     const testCase = JSON.parse(fs.readFileSync(filePath));
     const { n, k } = testCase.keys;
     const roots = [];
 
-    // Parse and decode roots
+    // Parsing and decode roots
     for (let key in testCase) {
         if (key === "keys") continue;
-        const x = parseInt(key, 10); // Key as x-coordinate
+        const x = parseInt(key, 10); 
         const { base, value } = testCase[key];
-        const y = decodeY(parseInt(base, 10), value); // Decode y-coordinate
+        const y = decodeY(parseInt(base, 10), value); 
         roots.push({ x, y });
     }
 
-    // Sort roots by x for consistency (optional)
     roots.sort((a, b) => a.x - b.x);
-
-    // Solve for the constant term
     return lagrangeInterpolation(roots, k);
 }
 
